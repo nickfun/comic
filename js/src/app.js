@@ -30,7 +30,7 @@ app.module('Form', function(oForm, oApp) {
 		var options = {
 			template: $('#template').val(),
 			pattern:  $('#pattern').val(),
-			linksOnly: $('#linksOnly').attr('checked')
+			linksOnly: $('#linksOnly').prop('checked')
 		};
 		console.log(options);
 	}
