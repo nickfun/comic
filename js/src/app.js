@@ -14,7 +14,7 @@ app.addInitializer(function() {
 // Form Module
 // ===========
 
-app.module('Form', function(oForm, oApp) {
+app.module('Main', function(oForm, oApp) {
 
 	// listen for when the form is submitted
 	$(function() {
@@ -33,7 +33,66 @@ app.module('Form', function(oForm, oApp) {
 			linksOnly: $('#linksOnly').prop('checked')
 		};
 		console.log(options);
+		callProcess(options);
+	}
+
+	function callProcess( options ) {
+		url = 'process.php' + oApp.utils.buildQueryString(options);
+		$.getJSON(url, ajax_success);
+	}
+	
+	function ajax_fail( oServerResponse ) {
+		console.error("AJAX failed :-(");
+	}
+	
+	function ajax_success( oServerResponse ) {
+		var i, list = oServerResponse.list;
+		var $img;
+		$('#output').empty();
+		for( i in list ) {
+			$img = $('<li><img src="' + list[i] + '"></li>');
+			$('#output').append($img);
+		}
 	}
 });
 
+app.module("utils", function( oModule, oApp ) {
+	
+	/**
+	 * Given key/value pairs, build query string for url
+	 * @since 2013-03-28
+	 */
+	oModule.buildQueryString = function( options ) {
+		if( _.isEmpty( options ) ) {
+			return "";
+		}
+		// turn into '&key=value'
+		var temp = _.map(options, function( value, key ) {
+			return '&' + encodeURIComponent(key) + '=' + encodeURIComponent(value);
+		});
+		// string them all together
+		var query = _.reduce(temp, function(previous, current) {
+			return previous + current;
+		});
+		// replace first & with ?
+		return '?' + query.slice(1);
+	};
+});
+
 app.start();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
