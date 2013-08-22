@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Apply a template to a range of indexes
+ * example template: http://source.com/img_@@.gif
+ * the @@ is the placeholder for the indexes
+ * 
+ * Optional: pass in a full url as a template, and the 
+ * max range will become the placeholder
+ * ex: range: 1-44
+ *     template: image-name44.gif
+ *
+ */
 function genLinks($template, $range) {
 	$max = max($range);
 	$len = strlen($max);
@@ -8,14 +19,17 @@ function genLinks($template, $range) {
 	if( strpos($template, '@@') > 0 ) {
 		$break = '@@';
 	}
-	list($pre, $post) = explode($break, $template);
+	$result = explode($break, $template);
+	if( count($result) !== 2 ) {
+		return false;
+	}
+	list($pre, $post) = $result;
 	$result = [];
 	foreach($range as $key => $value ) {
 		$valPad = str_pad($value, $len, '0', STR_PAD_LEFT);
 		$result[] = $pre . $valPad . $post;
 	}
 	return $result;
-
 }
 
 function buildRange($pattern) {
@@ -61,7 +75,12 @@ header('Content-Type: application/json');
 $template = $_GET['template'];
 $pattern  = $_GET['pattern'];
 
+$range = buildRange($pattern);
+$list  = genLinks($template, $range);
+$success = $list !== false;
+
 echo json_encode([
-	'range' => buildRange($pattern),
-	'list' => genLinks($template, buildRange($pattern)),
+	'success' => $success,
+	'range' => $range,
+	'list' => $list,
 ], JSON_PRETTY_PRINT);
