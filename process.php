@@ -6,7 +6,7 @@
  * the @@ is the placeholder for the indexes
  * 
  * Optional: pass in a full url as a template, and the 
- * max range will become the placeholder
+ * max of the range will become the placeholder
  * ex: range: 1-44
  *     template: image-name44.gif
  *
@@ -61,26 +61,37 @@ function buildRange($pattern) {
 	return $result;
 }
 
+/**
+ * @todo better handling of missing fields
+ */
 $required = ['template','pattern'];
 foreach( $required as $req ) {
 	if( !isset($_GET[$req]) ) {
 		// a field is missing
-		//header('HTTP/ 400 Bad Request');
-		die('error 400 -- bad request ' . $req);
+		header('HTTP/ 400 Bad Request');
+		die('error 400 -- bad request. missing parameter: ' . $req);
 	}
 }
 
-header('Content-Type: application/json');
+// Process
+// =======
 
 $template = $_GET['template'];
 $pattern  = $_GET['pattern'];
 
 $range = buildRange($pattern);
 $list  = genLinks($template, $range);
-$success = $list !== false;
+$success = ($list !== false);
+
+// Output
+// ======
+
+header('Content-Type: application/json');
 
 echo json_encode([
 	'success' => $success,
 	'range' => $range,
 	'list' => $list,
 ], JSON_PRETTY_PRINT);
+
+
