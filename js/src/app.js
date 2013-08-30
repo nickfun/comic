@@ -1,6 +1,8 @@
 /**
  * Comic Application
  *
+ * @todo really need to re-think how many modules I need and what their function is
+ *
  * @author nickfun
  * @date 2013-08-20
  */
@@ -45,13 +47,26 @@ app.module('Main', function(oForm, oApp) {
 		console.error("AJAX failed :-(");
 	}
 	
+	/**
+	 * @todo use a document fragment instead of appending each tag
+	 */
 	function ajax_success( oServerResponse ) {
 		var i, list = oServerResponse.list;
 		var $img;
 		$('#output').empty();
-		for( i in list ) {
-			$img = $('<li><img src="' + list[i] + '"></li>');
-			$('#output').append($img);
+		var bLinksOnly = $('#linksOnly').prop('checked');
+		if( bLinksOnly ) {
+			// add A tags
+			for( i in list ) {
+				$anchor = $('<li><a href="' + list[i] + '">' + list[i] + '</a></li>');
+				$('#output').append($anchor);
+			}
+		} else {
+			// add IMG tags
+				for( i in list ) {
+				$img = $('<li><img src="' + list[i] + '"></li>');
+				$('#output').append($img);
+			}
 		}
 	}
 });
